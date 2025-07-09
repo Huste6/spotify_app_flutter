@@ -1,4 +1,5 @@
 import 'package:client/cor/theme/app_pallete.dart';
+import 'package:client/features/auth/repositories/auth_remote_repository.dart';
 import 'package:client/features/auth/view/widgets/auth_gradient_button.dart';
 import 'package:client/features/auth/view/widgets/custom_field.dart';
 import 'package:flutter/material.dart';
@@ -69,7 +70,13 @@ class _SignupPageState extends State<SignupPage> {
               ),
               AuthGradientButton(
                 Text_Button: 'Sign up',
-                onTap: (){},
+                onTap: () async {
+                  final authRepository = AuthRemoteRepository();
+                  await authRepository.signup(
+                      name: nameController.text,
+                      email: emailController.text,
+                      password: passwordController.text);
+                },
               ),
               const SizedBox(
                 height: 20,

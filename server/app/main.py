@@ -5,6 +5,7 @@ from .routers import user as user_router
 import logging
 import uvicorn
 import os
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
@@ -12,6 +13,15 @@ app = FastAPI()
 logging.getLogger("sqlalchemy.engine").propagate = False
 logging.getLogger("sqlalchemy.engine").setLevel(logging.WARNING)
 logging.getLogger("sqlalchemy").setLevel(logging.WARNING)
+
+# Cho phép tất cả (dev)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Cho phép tất cả các domain
+    allow_credentials=True,
+    allow_methods=["*"],  # Cho phép tất cả các phương thức (GET, POST, OPTIONS, ...)
+    allow_headers=["*"],  # Cho phép tất cả headers (đặc biệt quan trọng với Content-Type, Authorization,...)
+)
 
 @app.on_event("startup")
 async def startup():
