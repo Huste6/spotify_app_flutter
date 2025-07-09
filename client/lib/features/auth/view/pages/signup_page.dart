@@ -84,8 +84,9 @@ class _SignupPageState extends State<SignupPage> {
                     return;
                   }
                   final authRepository = AuthRemoteRepository();
-                  await authRepository.signup(
+                  final res = await authRepository.signup(
                       name: name, email: email, password: password);
+                  print(res);
                 },
               ),
               const SizedBox(
