@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from ..models.user import User
-from ..schemas.user import UserCreate
+from ..schemas.user import UserCreate, UserLogin
 import bcrypt
 
 async def create_user_controller(user_data: UserCreate, db: AsyncSession):
@@ -28,3 +28,21 @@ async def create_user_controller(user_data: UserCreate, db: AsyncSession):
     await db.refresh(new_user)
 
     return new_user
+
+async def login_user_controller(user_data: UserLogin, db: AsyncSession):
+    # Tìm người dùng theo email
+    result = await db.execute(select(User).where(User.email == user_data.email))
+    existing_user = result.scalar_one_or_none()
+
+    if not existing_user:
+        raise HTTPException(status_code=400, detail="User with this email does not exist!")
+
+    # Kiểm tra mật khẩu
+    is_match = bcrypt.checkpw(user_data.password.encode('utf-8'), existing_user.password)
+
+    if not is_match:
+        raise HTTPException(status_code=400, detail="Incorrect password!")
+
+    return existing_user
+
+    

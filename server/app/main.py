@@ -19,7 +19,7 @@ async def startup():
         await conn.run_sync(user.Base.metadata.create_all)
 
 # Khai báo router
-app.include_router(user_router.router)
+app.include_router(user_router.router, prefix='/auth')
 
 # Chạy nếu file được gọi trực tiếp
 if __name__ == "__main__":
