@@ -6,6 +6,10 @@ from ..schemas.user import UserCreate, UserLogin
 import bcrypt
 
 async def create_user_controller(user_data: UserCreate, db: AsyncSession):
+    # Kiểm tra có data truyền vào không nếu không in ra lỗi
+    if not user_data.name.strip() or not user_data.email.strip() or not user_data.password.strip():
+        raise HTTPException(status_code=422, detail="All fields (name, email, password) must be non-empty.")
+
     # Kiểm tra xem email đã tồn tại chưa
     result = await db.execute(select(User).where(User.email == user_data.email))
     existing_user = result.scalar_one_or_none()
@@ -30,6 +34,10 @@ async def create_user_controller(user_data: UserCreate, db: AsyncSession):
     return new_user
 
 async def login_user_controller(user_data: UserLogin, db: AsyncSession):
+    # Kiểm tra có data truyền vào không nếu không in ra lỗi 
+    if not user_data.email.strip() or not user_data.password.strip():
+        raise HTTPException(status_code=422, detail="All fields (email, password) must be non-empty.")
+
     # Tìm người dùng theo email
     result = await db.execute(select(User).where(User.email == user_data.email))
     existing_user = result.scalar_one_or_none()
