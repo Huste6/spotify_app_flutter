@@ -1,16 +1,19 @@
 import 'dart:convert';
+import 'package:client/cor/constants/server_constant.dart';
+import 'package:client/cor/failure/failure.dart';
+import 'package:client/features/auth/model/user_model.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:http/http.dart' as http;
 
 class AuthRemoteRepository {
-  Future<Either<String, Map<String, dynamic>>> signup({
+  Future<Either<AppFailure, UserModel>> signup({
     required String name,
     required String email,
     required String password,
   }) async {
     try {
       final res = await http.post(
-        Uri.parse('http://localhost:8000/auth/signup'),
+        Uri.parse('${ServerConstant.serverUrl}/auth/signup'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -20,21 +23,25 @@ class AuthRemoteRepository {
           'password': password,
         }),
       );
-      if (res.statusCode != 201) {
+      final resBodyMap = jsonDecode(res.body) as Map<String, dynamic>;
+
+      if (res.statusCode != 200) {
         //handle the error
-        return Left(res.body);
+        //{'detail': 'error message'}
+        return Left(AppFailure(resBodyMap['detail']));
       }
-      final user = jsonDecode(res.body) as Map<String, dynamic>;
-      return Right(user);
+
+      return Right(UserModel.fromMap(resBodyMap));
     } catch (e) {
-      return Left(e.toString());
+      return Left(AppFailure(e.toString()));
     }
   }
 
-  Future<void> login({required String email, required String password}) async {
+  Future<Either<AppFailure, UserModel>> login(
+      {required String email, required String password}) async {
     try {
       final res = await http.post(
-        Uri.parse('http://localhost:8000/auth/login'),
+        Uri.parse('${ServerConstant.serverUrl}/auth/login'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -43,10 +50,17 @@ class AuthRemoteRepository {
           'password': password,
         }),
       );
-      print(res.body);
-      print(res.statusCode);
+      final resBodyMap = jsonDecode(res.body) as Map<String, dynamic>;
+
+      if (res.statusCode != 200) {
+        //handle the error
+        //{'detail': 'error message'}
+        return Left(AppFailure(resBodyMap['detail']));
+      }
+
+      return Right(UserModel.fromMap(resBodyMap));
     } catch (e) {
-      print(e);
+      return Left(AppFailure(e.toString()));
     }
   }
 }
