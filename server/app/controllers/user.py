@@ -4,6 +4,7 @@ from sqlalchemy import select
 from ..models.user import User
 from ..schemas.user import UserCreate, UserLogin
 import bcrypt
+import jwt
 
 async def create_user_controller(user_data: UserCreate, db: AsyncSession):
     # Kiểm tra có data truyền vào không nếu không in ra lỗi
@@ -51,6 +52,6 @@ async def login_user_controller(user_data: UserLogin, db: AsyncSession):
     if not is_match:
         raise HTTPException(status_code=400, detail="Incorrect password!")
 
-    return existing_user
-
+    token = jwt.encode({'id': existing_user.id}, 'password_key')
     
+    return {'token': token,'user': existing_user}

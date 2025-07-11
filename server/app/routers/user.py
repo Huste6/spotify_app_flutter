@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.ext.asyncio import AsyncSession
-from ..schemas.user import UserCreate, UserResponse, UserLogin
+from ..schemas.user import UserCreate, UserResponse, UserLogin, LoginResponse
 from ..database import SessionLocal
 from ..controllers import user as user_controller
 
@@ -14,6 +14,6 @@ async def get_db():
 async def create_user(user: UserCreate, db: AsyncSession = Depends(get_db)):
     return await user_controller.create_user_controller(user, db)
 
-@router.post("/login", response_model=UserResponse)
+@router.post("/login", response_model=LoginResponse)
 async def login_user(user: UserLogin, db: AsyncSession = Depends(get_db)):
     return await user_controller.login_user_controller(user, db)
