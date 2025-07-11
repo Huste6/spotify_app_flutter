@@ -8,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'auth_remote_repository.g.dart';
 
-@riverpod
+@Riverpod(keepAlive: true)
 AuthRemoteRepository authRemoteRepository(AuthRemoteRepositoryRef ref) {
   return AuthRemoteRepository();
 }
@@ -68,6 +68,26 @@ class AuthRemoteRepository {
 
       return Right(UserModel.fromMap(resBodyMap['user'])
           .copyWith(token: resBodyMap['token']));
+    } catch (e) {
+      return Left(AppFailure(e.toString()));
+    }
+  }
+
+  Future<Either<AppFailure, UserModel>> getCurrentUserData(
+      {required String token}) async {
+    try {
+      final res = await http
+          .get(Uri.parse('${ServerConstant.serverUrl}/auth/'), headers: {
+        'Content-Type': 'application/json',
+        'x-auth-token': token,
+      });
+      final resBodyMap = jsonDecode(res.body) as Map<String, dynamic>;
+
+      if (res.statusCode != 200) {
+        return Left(AppFailure(resBodyMap['detail']));
+      }
+
+      return Right(UserModel.fromMap(resBodyMap).copyWith(token: token));
     } catch (e) {
       return Left(AppFailure(e.toString()));
     }

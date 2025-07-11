@@ -31,7 +31,8 @@ class _SignupPageState extends ConsumerState<SignupPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isLoading = ref.watch(authViewModelProvider)?.isLoading == true;
+    final isLoading = ref
+        .watch(authViewModelProvider.select((val) => val?.isLoading == true));
 
     //Lắng nghe sự thay đổi của provider nhận vào prev và next nhưng ở đây xử lý sau khi mà có sự thay đổi provider
     ref.listen(authViewModelProvider, (_, next) {
