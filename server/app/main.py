@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from .database import engine
 from .models import user
 from .routers import user as user_router
+from .routers import song as song_router
 import logging
 import uvicorn
 import os
@@ -30,6 +31,7 @@ async def startup():
 
 # Khai báo router
 app.include_router(user_router.router, prefix='/auth')
+app.include_router(song_router.router, prefix='/song')
 
 # Chạy nếu file được gọi trực tiếp
 if __name__ == "__main__":

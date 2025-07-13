@@ -1,0 +1,29 @@
+# Flutter
+build/
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+.melos_tool/
+.pub-cache/
+
+# Android
+android/.gradle/
+android/local.properties
+android/app/key.properties
+
+# iOS
+ios/Flutter/Generated.xcconfig
+ios/Pods/
+ios/Runner.xcworkspace/
+
+# IDE settings
+.vscode/
+.vs/
+
+# Logs
+hs_err_pid*.log
+*.log
+
+# macOS system
+.DS_Store

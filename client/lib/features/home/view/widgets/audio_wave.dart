@@ -1,4 +1,5 @@
 import 'package:audio_waveforms/audio_waveforms.dart';
+import 'package:client/cor/theme/app_pallete.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -51,8 +52,14 @@ class _AudioWaveState extends State<AudioWave> {
             )),
         Expanded(
           child: AudioFileWaveforms(
-              size: const Size(double.infinity, 100),
-              playerController: playerController),
+            size: const Size(double.infinity, 100),
+            playerController: playerController,
+            playerWaveStyle: const PlayerWaveStyle(
+                fixedWaveColor: Pallete.borderColor,
+                liveWaveColor: Pallete.gradient2,
+                spacing: 6,
+                showSeekLine: false),
+          ),
         ),
       ],
     );
