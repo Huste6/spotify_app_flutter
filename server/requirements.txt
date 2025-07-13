@@ -5,3 +5,5 @@ psycopg2-binary==2.9.9
 asyncpg
 bcrypt
 PyJWT
+cloudinary
+uuid
