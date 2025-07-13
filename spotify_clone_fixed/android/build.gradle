@@ -16,3 +16,11 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
+
+buildscript {
+    ext.flutterBuildModeOptions = [
+        'debug': ['--no-tree-shake-icons'],
+        'profile': ['--no-tree-shake-icons'],
+        'release': []
+    ]
+}
