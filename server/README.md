@@ -28,6 +28,6 @@ uvicorn app.main:app --reload
 
 ### 6. Truy cập tài liệu API
 ```bash
-Swagger UI: http://localhost:8000/docs
+Swagger UI: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 Posgres: http://localhost:5050/ 
 ```
