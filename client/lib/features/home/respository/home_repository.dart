@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:client/cor/constants/server_constant.dart';
 import 'package:client/cor/failure/failure.dart';
+import 'package:client/features/home/model/song_model.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -56,6 +58,36 @@ class HomeRepository { // Corrected typo
       } else {
         return Left(AppFailure('Server error: ${response.body}'));
       }
+    } catch (e) {
+      return Left(AppFailure(e.toString()));
+    }
+  }
+
+  Future<Either<AppFailure, List<SongModel>>> getAllSongs({
+    required String token,
+  }) async {
+    try {
+      final res = await http.get(
+        Uri.parse('${ServerConstant.serverUrl}/song/list'),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token,
+        },
+      );
+      // res.body trả về Json(String)
+      var resBodyMap = jsonDecode(res.body);
+
+      if (res.statusCode != 200) {
+        resBodyMap = resBodyMap as Map<String, dynamic>;
+        return Left(AppFailure(resBodyMap['detail'] ?? 'Unknown error'));
+      }
+
+      resBodyMap = resBodyMap as List;
+      final List<SongModel> songs = resBodyMap
+          .map((songJson) => SongModel.fromMap(songJson))
+          .toList();
+
+      return Right(songs);
     } catch (e) {
       return Left(AppFailure(e.toString()));
     }
