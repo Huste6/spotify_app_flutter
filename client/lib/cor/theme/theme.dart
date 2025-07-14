@@ -17,5 +17,8 @@ class AppTheme {
         contentPadding: const EdgeInsets.all(27),
         enabledBorder: _border(Pallete.borderColor, 1.0),
         focusedBorder: _border(Pallete.gradient2, 3.0)),
+    bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+      backgroundColor: Pallete.backgroundColor
+    )
   );
 }
