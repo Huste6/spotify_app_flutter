@@ -1,3 +1,4 @@
+import 'package:client/cor/providers/current_song_notifier.dart';
 import 'package:client/cor/theme/app_pallete.dart';
 import 'package:client/cor/widgets/loader.dart';
 import 'package:client/features/home/viewmodel/home_viewmodel.dart';
@@ -29,48 +30,53 @@ class SongsPage extends ConsumerWidget {
                   itemCount: songs.length,
                   itemBuilder: (context, index) {
                     final song = songs[index];
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: Column(
-                        children: [
-                          Container(
-                            width: 180,
-                            height: 180,
-                            decoration: BoxDecoration(
-                              image: DecorationImage(
-                                image: NetworkImage(song.thumbnail_url),
-                                fit: BoxFit.cover,
+                    return GestureDetector(
+                      onTap: (){
+                        ref.read(currentSongNotifierProvider.notifier).updateSong(song);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Column(
+                          children: [
+                            Container(
+                              width: 180,
+                              height: 180,
+                              decoration: BoxDecoration(
+                                image: DecorationImage(
+                                  image: NetworkImage(song.thumbnail_url),
+                                  fit: BoxFit.cover,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              borderRadius: BorderRadius.circular(10),
                             ),
-                          ),
-                          const SizedBox(height: 5),
-                          SizedBox(
-                            width: 180,
-                            child: Text(
-                              song.song_name,
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w700,
-                                overflow: TextOverflow.ellipsis
-                              ),
-                              maxLines: 1,
-                            ),
-                          ),
-                          SizedBox(
-                            width: 180,
-                            child: Text(
-                              song.artist,
-                              style: const TextStyle(
-                                  color: Pallete.subtitleText,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
+                            const SizedBox(height: 5),
+                            SizedBox(
+                              width: 180,
+                              child: Text(
+                                song.song_name,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
                                   overflow: TextOverflow.ellipsis
+                                ),
+                                maxLines: 1,
                               ),
-                              maxLines: 1,
                             ),
-                          ),
-                        ],
+                            SizedBox(
+                              width: 180,
+                              child: Text(
+                                song.artist,
+                                style: const TextStyle(
+                                    color: Pallete.subtitleText,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                    overflow: TextOverflow.ellipsis
+                                ),
+                                maxLines: 1,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     );
                   },
