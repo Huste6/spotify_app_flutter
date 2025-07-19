@@ -12,7 +12,7 @@ class MusicPlayer extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final currentSong = ref.watch(currentSongNotifierProvider);
     final songNotifier = ref.read(currentSongNotifierProvider.notifier);
-    String _formatDuration(Duration? duration) {
+    String formatDuration(Duration? duration) {
       if (duration == null) return '00:00';
       final minutes = duration.inMinutes.remainder(60).toString().padLeft(2, '0');
       final seconds = duration.inSeconds.remainder(60).toString().padLeft(2, '0');
@@ -148,7 +148,7 @@ class MusicPlayer extends ConsumerWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                _formatDuration(position),
+                                formatDuration(position),
                                 style: const TextStyle(
                                   color: Pallete.subtitleText,
                                   fontSize: 13,
@@ -156,7 +156,7 @@ class MusicPlayer extends ConsumerWidget {
                                 ),
                               ),
                               Text(
-                                _formatDuration(duration),
+                                formatDuration(duration),
                                 style: const TextStyle(
                                   color: Pallete.subtitleText,
                                   fontSize: 13,
