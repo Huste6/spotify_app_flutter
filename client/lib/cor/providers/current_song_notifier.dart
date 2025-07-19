@@ -1,30 +1,39 @@
 import 'package:client/features/home/model/song_model.dart';
 import 'package:client/features/home/respository/home_local_respository.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:just_audio_background/just_audio_background.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:just_audio/just_audio.dart';
 part 'current_song_notifier.g.dart';
 
 @riverpod
-class CurrentSongNotifier extends _$CurrentSongNotifier{
+class CurrentSongNotifier extends _$CurrentSongNotifier {
   late HomeLocalRespository _homeLocalRespository;
   AudioPlayer? audioPlayer;
   bool isPlaying = false;
 
   @override
-  SongModel? build(){
+  SongModel? build() {
     _homeLocalRespository = ref.watch(homeLocalRespositoryProvider);
     return null;
   }
 
-  void updateSong(SongModel song) async{
+  void updateSong(SongModel song) async {
     await audioPlayer?.stop();
     audioPlayer = AudioPlayer();
-    final audioSource = AudioSource.uri(Uri.parse(song.song_url));
+    final audioSource = AudioSource.uri(
+      Uri.parse(song.song_url),
+      tag: MediaItem(
+        id: song.id,
+        title: song.song_name,
+        artist: song.artist,
+        artUri: Uri.parse(song.thumbnail_url),
+      ),
+    );
     await audioPlayer!.setAudioSource(audioSource);
 
-    audioPlayer!.playerStateStream.listen((state){
-      if(state.processingState == ProcessingState.completed){
+    audioPlayer!.playerStateStream.listen((state) {
+      if (state.processingState == ProcessingState.completed) {
         audioPlayer!.seek(Duration.zero);
         audioPlayer!.pause();
         isPlaying = false;
@@ -37,10 +46,10 @@ class CurrentSongNotifier extends _$CurrentSongNotifier{
     state = song;
   }
 
-  void playPause(){
-    if(isPlaying){
+  void playPause() {
+    if (isPlaying) {
       audioPlayer?.pause();
-    }else{
+    } else {
       audioPlayer?.play();
     }
     isPlaying = !isPlaying;
@@ -50,12 +59,12 @@ class CurrentSongNotifier extends _$CurrentSongNotifier{
   }
 
   void seek(double val) async {
-    if(audioPlayer == null || audioPlayer!.duration == null) return;
+    if (audioPlayer == null || audioPlayer!.duration == null) return;
     final duration = audioPlayer!.duration!;
-    final position = duration*val;
-    try{
+    final position = duration * val;
+    try {
       await audioPlayer!.seek(position);
-    }catch(e){
+    } catch (e) {
       debugPrint(e as String?);
     }
   }
