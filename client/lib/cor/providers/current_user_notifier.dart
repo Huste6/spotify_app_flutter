@@ -13,4 +13,12 @@ class CurrentUserNotifier extends _$CurrentUserNotifier {
   void addUser(UserModel user) {
     state = user;
   }
+
+  void removeUser(){
+    state = null;
+  }
+
+  void updateUser(UserModel updatedUser){
+    state = updatedUser;
+  }
 }

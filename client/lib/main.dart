@@ -1,3 +1,4 @@
+import 'package:client/cor/model/user_model.dart';
 import 'package:client/cor/providers/current_user_notifier.dart';
 import 'package:client/cor/theme/theme.dart';
 import 'package:client/features/auth/view/pages/login_page.dart';
@@ -20,9 +21,15 @@ void main() async {
   final dir = await getApplicationDocumentsDirectory();
   Hive.defaultDirectory = dir.path;
   final container = ProviderContainer();
-  await container.read(authViewModelProvider.notifier).initSharedPreferences();
-  await container.read(authViewModelProvider.notifier).getData();
-  runApp(UncontrolledProviderScope(container: container, child: const MyApp()));
+
+  try {
+    await container.read(authViewModelProvider.notifier).initSharedPreferences();
+    final userdata = await container.read(authViewModelProvider.notifier).getData();
+    runApp(UncontrolledProviderScope(container: container, child: const MyApp()));
+  } catch (e) {
+    print('Error during initialization: $e');
+    runApp(UncontrolledProviderScope(container: container, child: const MyApp()));
+  }
 }
 
 class MyApp extends ConsumerWidget {
@@ -31,12 +38,27 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentUser = ref.watch(currentUserNotifierProvider);
+    final authState = ref.watch(authViewModelProvider);
 
     return MaterialApp(
       title: 'Music App',
       theme: AppTheme.darkThemeMode,
       debugShowCheckedModeBanner: false,
-      home: currentUser == null ? const LoginPage() : const HomePage(),
+      home: _buildHome(currentUser,authState),
     );
+  }
+
+  Widget _buildHome(currentUser, AsyncValue<UserModel>? authState){
+    if(authState?.isLoading == true){
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+    if(currentUser!=null){
+      return const HomePage();
+    }
+    return const LoginPage();
   }
 }

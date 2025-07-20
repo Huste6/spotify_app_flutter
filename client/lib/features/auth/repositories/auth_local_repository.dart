@@ -26,4 +26,10 @@ class AuthLocalRepository {
     await init();
     return _sharedPreferences?.getString('x-auth-token');
   }
+
+  Future<void> clearToken() async{
+    await init();
+    const key = 'x-auth-token';
+    await _sharedPreferences?.remove(key);
+  }
 }

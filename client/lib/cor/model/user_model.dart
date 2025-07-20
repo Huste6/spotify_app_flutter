@@ -7,6 +7,7 @@ class UserModel {
   final int id;
   final String token;
   final List<FavSongModel> favorites;
+  final String avatar;
 
   const UserModel({
     required this.name,
@@ -14,6 +15,7 @@ class UserModel {
     required this.id,
     required this.token,
     required this.favorites,
+    this.avatar = '',
   });
 
   Map<String, dynamic> toMap() {
@@ -23,6 +25,7 @@ class UserModel {
       'id': id,
       'token': token,
       'favorites': favorites.map((x) => x.toMap()).toList(),
+      'avatar': avatar
     };
   }
 
@@ -41,6 +44,7 @@ class UserModel {
         ),
       )
           : [],
+      avatar: map['avatar'].toString()
     );
   }
 
@@ -52,7 +56,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(name: $name, email: $email, id: $id, token: $token, favorites: $favorites)';
+    return 'UserModel(name: $name, email: $email, id: $id, token: $token, favorites: $favorites, avatar: $avatar)';
   }
 
   @override
@@ -62,12 +66,13 @@ class UserModel {
     return other.name == name &&
         other.email == email &&
         other.id == id &&
-        other.token == token;
+        other.token == token &&
+        other.avatar == avatar;
   }
 
   @override
   int get hashCode {
-    return name.hashCode ^ email.hashCode ^ id.hashCode ^ token.hashCode;
+    return name.hashCode ^ email.hashCode ^ id.hashCode ^ token.hashCode ^ avatar.hashCode;
   }
 
   UserModel copyWith({
@@ -76,6 +81,7 @@ class UserModel {
     int? id,
     String? token,
     List<FavSongModel>? favorites,
+    String? avatar,
   }) {
     return UserModel(
       name: name ?? this.name,
@@ -83,6 +89,7 @@ class UserModel {
       id: id ?? this.id,
       token: token ?? this.token,
       favorites: favorites ?? this.favorites,
+      avatar: avatar ?? this.avatar
     );
   }
 }

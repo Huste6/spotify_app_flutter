@@ -63,22 +63,39 @@ class AuthViewModel extends _$AuthViewModel {
   }
 
   Future<UserModel?> getData() async {
-    state = const AsyncValue.loading();
-    final token = await _authLocalRepository.getToken();
-    if (token != null) {
+    try{
+      state = const AsyncValue.loading();
+      final token = await _authLocalRepository.getToken();
+      if(token == null){
+        state = null;
+        return null;
+      }
       final res = await _authRemoteRepository.getCurrentUserData(token: token);
       final val = switch (res) {
-        Left(value: final l) => state =
-            AsyncValue.error(l.message, StackTrace.current),
+        Left(value: final l) => {
+          await _authLocalRepository.clearToken(),
+          state =
+              AsyncValue.error(l.message, StackTrace.current)
+        },
         Right(value: final r) => _getDataSuccess(r),
       };
-      return val.value;
+      return val is AsyncValue<UserModel> ? val.value : null;
+          return null;
+    }catch(e){
+      print(e);
+      state = null;
+      return null;
     }
-    return null;
   }
 
   AsyncValue<UserModel> _getDataSuccess(UserModel user) {
     _currentUserNotifier.addUser(user);
     return state = AsyncValue.data(user);
+  }
+
+  Future<void> logout() async {
+    await _authLocalRepository.clearToken();
+    _currentUserNotifier.removeUser();
+    state = null;
   }
 }

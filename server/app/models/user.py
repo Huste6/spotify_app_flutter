@@ -8,6 +8,7 @@ class User(Base):
     name = Column(String, nullable=False)
     email = Column(String, nullable=False, unique=True)
     password = Column(LargeBinary, nullable=False)
+    avatar = Column(String, nullable=True)
     
     favorites = relationship('Favorite', back_populates = 'user')
     
