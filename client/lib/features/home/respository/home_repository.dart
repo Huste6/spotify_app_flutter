@@ -92,4 +92,64 @@ class HomeRepository { // Corrected typo
       return Left(AppFailure(e.toString()));
     }
   }
+
+  Future<Either<AppFailure, bool>> favSong({
+    required String token,
+    required String songId
+  }) async {
+    try {
+      final res = await http.post(
+        Uri.parse('${ServerConstant.serverUrl}/song/favorite'),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token,
+        },
+        body: jsonEncode(
+          {
+          "song_id": songId,
+          },
+        )
+      );
+      // res.body trả về Json(String)
+      var resBodyMap = jsonDecode(res.body);
+
+      if (res.statusCode != 200) {
+        resBodyMap = resBodyMap as Map<String, dynamic>;
+        return Left(AppFailure(resBodyMap['detail'] ?? 'Unknown error'));
+      }
+      return Right(resBodyMap['message']);
+    } catch (e) {
+      return Left(AppFailure(e.toString()));
+    }
+  }
+
+  Future<Either<AppFailure, List<SongModel>>> getAllFavSongs({
+    required String token,
+  }) async {
+    try {
+      final res = await http.get(
+        Uri.parse('${ServerConstant.serverUrl}/song/list_favorite'),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token,
+        },
+      );
+      // res.body trả về Json(String)
+      var resBodyMap = jsonDecode(res.body);
+
+      if (res.statusCode != 200) {
+        resBodyMap = resBodyMap as Map<String, dynamic>;
+        return Left(AppFailure(resBodyMap['detail'] ?? 'Unknown error'));
+      }
+
+      resBodyMap = resBodyMap as List;
+      final List<SongModel> songs = resBodyMap
+          .map((songJson) => SongModel.fromMap(songJson['song']))
+          .toList();
+
+      return Right(songs);
+    } catch (e) {
+      return Left(AppFailure(e.toString()));
+    }
+  }
 }

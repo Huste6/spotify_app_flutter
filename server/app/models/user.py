@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, LargeBinary
 from ..database import Base
-
+from sqlalchemy.orm import relationship
 class User(Base):
     __tablename__ = "users"
 
@@ -8,3 +8,6 @@ class User(Base):
     name = Column(String, nullable=False)
     email = Column(String, nullable=False, unique=True)
     password = Column(LargeBinary, nullable=False)
+    
+    favorites = relationship('Favorite', back_populates = 'user')
+    

@@ -1,9 +1,14 @@
 import cloudinary
 import cloudinary.uploader
 from fastapi import HTTPException
+from sqlalchemy import select
 from ..models.song import Song
+from ..models.favorite import Favorite
 from ..schemas.song import SongResponse
+from ..schemas.favorite import FavoriteResponse
 import uuid
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 cloudinary.config( 
     cloud_name = "dwpeoekrv", 
@@ -61,5 +66,58 @@ async def get_list_song(db):
         )
         songs = result.fetchall()
         return [SongResponse.from_orm(song) for song in songs]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    
+from sqlalchemy.future import select
+from sqlalchemy.orm import joinedload
+
+async def favorite_song(fav_song, db: AsyncSession, uid: int):
+    try:
+        result = await db.execute(
+            select(Favorite).where(Favorite.user_id == uid, Favorite.song_id == fav_song.song_id)
+        )
+        existing = result.scalar_one_or_none()
+        if existing:
+            await db.delete(existing)
+            await db.commit()
+            return {'message': False}
+
+        new_favorite = Favorite(
+            id=str(uuid.uuid4()),
+            user_id=uid,
+            song_id=fav_song.song_id
+        )
+        db.add(new_favorite)
+        await db.commit()
+
+        # Load lại để eagerly load quan hệ
+        result = await db.execute(
+            select(Favorite)
+            .options(joinedload(Favorite.song))
+            .options(joinedload(Favorite.user))
+            .where(Favorite.user_id == uid, Favorite.song_id == fav_song.song_id)
+        )
+        new_favorite_with_relations = result.scalar_one_or_none()
+
+        return {
+            "message": True,
+            "new_favorite": FavoriteResponse.model_validate(new_favorite_with_relations)
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+    
+async def get_list_favorite_song(db: AsyncSession, uid: int):
+    try:
+        result = await db.execute(
+            select(Favorite)
+            .options(joinedload(Favorite.song)) 
+            .options(joinedload(Favorite.user))
+            .where(Favorite.user_id == uid)
+        )
+        favorites = result.scalars().all()
+        return favorites
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

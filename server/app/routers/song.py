@@ -3,6 +3,7 @@ from ..database import SessionLocal
 from sqlalchemy.ext.asyncio import AsyncSession
 from ..middleware.auth_middleware import auth_middleware
 from ..schemas.song import SongResponse
+from ..schemas.favorite import FavoriteSong, FavoriteResponse,FavoriteToggleResponse
 from ..controllers import song as song_controller
 from typing import List
 
@@ -36,3 +37,11 @@ async def upload_song(
 @router.get('/list',response_model=List[SongResponse])
 async def get_list_song(db: AsyncSession = Depends(get_db),auth_dict = Depends(auth_middleware)):
     return await song_controller.get_list_song(db=db)
+
+@router.post('/favorite',response_model=FavoriteToggleResponse)
+async def favorite_song(fav_song: FavoriteSong,db: AsyncSession = Depends(get_db), user_dict = Depends(auth_middleware)):
+    return await song_controller.favorite_song(fav_song,db,user_dict['uid'])
+
+@router.get('/list_favorite',response_model=List[FavoriteResponse])
+async def list_favorite_song(db:AsyncSession = Depends(get_db), user_dict = Depends(auth_middleware)):
+    return await song_controller.get_list_favorite_song(db,user_dict['uid'])

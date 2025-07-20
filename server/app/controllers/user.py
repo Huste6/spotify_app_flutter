@@ -6,6 +6,7 @@ from ..schemas.user import UserCreate, UserLogin
 import bcrypt
 import jwt
 from ..config import SECRET_KEY, ALGORITHM
+from sqlalchemy.orm import joinedload
 
 async def create_user_controller(user_data: UserCreate, db: AsyncSession):
     # Kiểm tra có data truyền vào không nếu không in ra lỗi
@@ -58,8 +59,8 @@ async def login_user_controller(user_data: UserLogin, db: AsyncSession):
     return {'token': token,'user': existing_user}
 
 async def get_current_user_data(db: AsyncSession, uid: int):
-    result = await db.execute(select(User).where(User.id == uid))
-    user = result.scalar_one_or_none()
+    result = await db.execute(select(User).options(joinedload(User.favorites)).where(User.id == uid))
+    user = result.unique().scalar_one_or_none()
     
     if not user:
         raise HTTPException(status_code=401, detail='User not found')
