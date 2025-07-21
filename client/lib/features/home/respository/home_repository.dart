@@ -14,7 +14,7 @@ HomeRepository homeRepository(HomeRepositoryRef ref) {
   return HomeRepository();
 }
 
-class HomeRepository { // Corrected typo
+class HomeRepository {
   Future<Either<AppFailure, String>> uploadSong({
     required File selectedAudio,
     required File selectedThumbnail,
@@ -149,6 +149,33 @@ class HomeRepository { // Corrected typo
 
       return Right(songs);
     } catch (e) {
+      return Left(AppFailure(e.toString()));
+    }
+  }
+
+  Future<Either<AppFailure, List<SongModel>>> getSearchSong({
+    required String token,
+    required String searchQuery
+  })async{
+    try{
+      final res = await http.get(
+        Uri.parse('${ServerConstant.serverUrl}/song/search?searchQuery=$searchQuery'),
+        headers: {
+          'Content-Type': 'application/json',
+          'x-auth-token': token,
+        },
+      );
+      var resBodyMap = jsonDecode(res.body);
+      if (res.statusCode != 200) {
+        resBodyMap = resBodyMap as Map<String, dynamic>;
+        return Left(AppFailure(resBodyMap['detail'] ?? 'Unknown error'));
+      }
+      resBodyMap = resBodyMap as List;
+      final List<SongModel> songs = resBodyMap
+          .map((songJson) => SongModel.fromMap(songJson))
+          .toList();
+      return Right(songs);
+    }catch(e){
       return Left(AppFailure(e.toString()));
     }
   }

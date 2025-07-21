@@ -13,7 +13,8 @@ part 'home_viewmodel.g.dart';
 
 @riverpod
 Future<List<SongModel>> getAllSongs(GetAllSongsRef ref) async {
-  final token = ref.watch(currentUserNotifierProvider.select((user) => user!.token));
+  final token =
+      ref.watch(currentUserNotifierProvider.select((user) => user!.token));
   final res = await ref.watch(homeRepositoryProvider).getAllSongs(token: token);
   return switch (res) {
     Left(value: final l) => throw l.message,
@@ -23,9 +24,25 @@ Future<List<SongModel>> getAllSongs(GetAllSongsRef ref) async {
 
 @riverpod
 Future<List<SongModel>> getFavSongs(GetFavSongsRef ref) async {
-  final token = ref.watch(currentUserNotifierProvider.select((user) => user!.token));
+  final token =
+      ref.watch(currentUserNotifierProvider.select((user) => user!.token));
   final res =
       await ref.watch(homeRepositoryProvider).getAllFavSongs(token: token);
+  return switch (res) {
+    Left(value: final l) => throw l.message,
+    Right(value: final r) => r
+  };
+}
+
+@riverpod
+Future<List<SongModel>> getSearchSongs(
+    GetSearchSongsRef ref, String searchQuery) async {
+  final token =
+      ref.watch(currentUserNotifierProvider.select((user) => user!.token));
+  final res = await ref.watch(homeRepositoryProvider).getSearchSong(
+        token: token,
+        searchQuery: searchQuery,
+      );
   return switch (res) {
     Left(value: final l) => throw l.message,
     Right(value: final r) => r
@@ -86,24 +103,20 @@ class HomeViewModel extends _$HomeViewModel {
   AsyncValue _favSongSuccess(bool isFavorited, String songId) {
     final userNotifier = ref.read(currentUserNotifierProvider.notifier);
     if (isFavorited) {
-      userNotifier.addUser(
-          ref.read(currentUserNotifierProvider)!.copyWith(
-            favorites: [
-              ...ref.read(currentUserNotifierProvider)!.favorites,
-              FavSongModel(id: '', song_id: songId, user_id: '')
-            ],
-          )
-      );
+      userNotifier.addUser(ref.read(currentUserNotifierProvider)!.copyWith(
+        favorites: [
+          ...ref.read(currentUserNotifierProvider)!.favorites,
+          FavSongModel(id: '', song_id: songId, user_id: '')
+        ],
+      ));
     } else {
-      userNotifier.addUser(
-          ref.read(currentUserNotifierProvider)!.copyWith(
+      userNotifier.addUser(ref.read(currentUserNotifierProvider)!.copyWith(
             favorites: ref
                 .read(currentUserNotifierProvider)!
                 .favorites
                 .where((fav) => fav.song_id != songId)
                 .toList(),
-          )
-      );
+          ));
     }
     ref.invalidate(getFavSongsProvider);
     return state = AsyncValue.data(isFavorited);

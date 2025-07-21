@@ -2,6 +2,7 @@ import 'package:client/cor/providers/current_song_notifier.dart';
 import 'package:client/cor/theme/app_pallete.dart';
 import 'package:client/cor/utils.dart';
 import 'package:client/features/home/view/pages/library_page.dart';
+import 'package:client/features/search/pages/search_page.dart';
 import 'package:client/features/home/view/pages/songs_page.dart';
 import 'package:client/features/home/view/widgets/music_slab.dart';
 import 'package:flutter/material.dart';
@@ -26,7 +27,8 @@ class _HomePageState extends ConsumerState<HomePage> {
         preferredSize: const Size.fromHeight(100),
         child: Container(
           decoration: currentSong == null
-              ? null : BoxDecoration(
+              ? null
+              : BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
                       hexToColor(currentSong.hexCode),
@@ -98,7 +100,15 @@ class _HomePageState extends ConsumerState<HomePage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           _buildActionButton(
-                              icon: Icons.search_rounded, onPressed: () {}),
+                              icon: Icons.search_rounded,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const SearchPage(),
+                                  ),
+                                );
+                              }),
                           const SizedBox(
                             width: 8,
                           ),
@@ -108,7 +118,6 @@ class _HomePageState extends ConsumerState<HomePage> {
                       ),
                     ],
                   ),
-
                 ],
               ),
             ),

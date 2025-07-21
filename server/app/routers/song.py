@@ -45,3 +45,7 @@ async def favorite_song(fav_song: FavoriteSong,db: AsyncSession = Depends(get_db
 @router.get('/list_favorite',response_model=List[FavoriteResponse])
 async def list_favorite_song(db:AsyncSession = Depends(get_db), user_dict = Depends(auth_middleware)):
     return await song_controller.get_list_favorite_song(db,user_dict['uid'])
+
+@router.get('/search', response_model=List[SongResponse])
+async def search_query(searchQuery: str, db: AsyncSession = Depends(get_db),auth_dict = Depends(auth_middleware)):
+    return await song_controller.get_song_search(db, searchQuery)
