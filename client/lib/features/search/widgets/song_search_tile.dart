@@ -1,4 +1,7 @@
+import 'package:client/cor/providers/current_song_notifier.dart';
+import 'package:client/cor/theme/app_pallete.dart';
 import 'package:client/cor/utils.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/features/home/model/song_model.dart';
@@ -20,12 +23,6 @@ class SongSearchTile extends ConsumerStatefulWidget {
 class _SongSearchTileState extends ConsumerState<SongSearchTile> {
   bool _isPressed = false;
 
-  bool _isFavorited() {
-    final currentUser = ref.read(currentUserNotifierProvider);
-    if (currentUser == null) return false;
-    return currentUser.favorites.any((fav) => fav.song_id == widget.song.id);
-  }
-
   void _onTapDown(TapDownDetails details) {
     setState(() => _isPressed = true);
   }
@@ -41,16 +38,20 @@ class _SongSearchTileState extends ConsumerState<SongSearchTile> {
   void _onTap() {
     // Handle song play logic here
     print('Playing song: ${widget.song.song_name}');
+    ref
+        .read(currentSongNotifierProvider.notifier)
+        .updateSong(widget.song);
   }
 
-  void _onFavoritePressed() {
-    ref.read(homeViewModelProvider.notifier).favSong(songId: widget.song.id);
+  void _onFavoritePressed() async{
+    await ref.read(homeViewModelProvider.notifier).favSong(songId: widget.song.id);
   }
 
   @override
   Widget build(BuildContext context) {
-    final isFavorited = _isFavorited();
     final themeColor = hexToColor(widget.song.hexCode);
+    final userFavorites = ref
+        .watch(currentUserNotifierProvider.select((data) => data!.favorites));
 
     return GestureDetector(
       onTapDown: _onTapDown,
@@ -142,10 +143,19 @@ class _SongSearchTileState extends ConsumerState<SongSearchTile> {
               children: [
                 // Favorite Button
                 IconButton(
-                  onPressed: _onFavoritePressed,
+                  onPressed: () async {
+                    await ref
+                        .read(homeViewModelProvider.notifier)
+                        .favSong(songId: widget.song.id);
+                  },
                   icon: Icon(
-                    isFavorited ? Icons.favorite : Icons.favorite_border,
-                    color: isFavorited ? Colors.red : Colors.grey.shade400,
+                    userFavorites
+                        .where((fav) => fav.song_id == widget.song.id)
+                        .toList()
+                        .isNotEmpty
+                        ? CupertinoIcons.heart_fill
+                        : CupertinoIcons.heart,
+                    color: Pallete.whiteColor,
                   ),
                 ),
               ],

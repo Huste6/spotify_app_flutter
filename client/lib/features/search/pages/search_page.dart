@@ -1,4 +1,5 @@
 import 'package:client/cor/theme/app_pallete.dart';
+import 'package:client/features/home/view/widgets/music_slab.dart';
 import 'package:client/features/search/widgets/search_app_bar.dart';
 import 'package:client/features/search/widgets/search_empty_state.dart';
 import 'package:client/features/search/widgets/search_results.dart';
@@ -59,7 +60,16 @@ class _SearchPageState extends ConsumerState<SearchPage> {
             child: _searchQuery.isEmpty
                 ? const SearchEmptyState()
                 : SearchResults(searchQuery: _searchQuery),
-          )
+          ),
+          const Padding(
+            padding:  EdgeInsets.only(bottom: 8.0),
+            child:  Positioned(
+              bottom: 0,
+              left: 8,
+              right: 8,
+              child: MusicSlab(),
+            ),
+          ),
         ],
       ),
     );
