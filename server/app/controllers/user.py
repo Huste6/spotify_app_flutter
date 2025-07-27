@@ -1,12 +1,22 @@
-from fastapi import HTTPException
+from typing import Optional
+from fastapi import HTTPException, UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from ..models.user import User
-from ..schemas.user import UserCreate, UserLogin
+from ..schemas.user import UserCreate, UserLogin, UserUpdate
 import bcrypt
 import jwt
 from ..config import SECRET_KEY, ALGORITHM
 from sqlalchemy.orm import joinedload
+import cloudinary
+import cloudinary.uploader
+
+cloudinary.config( 
+    cloud_name = "dwpeoekrv", 
+    api_key = "521443384342867", 
+    api_secret = "GaE6-lPz3lOk89x_KYo5fhTGXn0",
+    secure=True
+)
 
 async def create_user_controller(user_data: UserCreate, db: AsyncSession):
     # Kiểm tra có data truyền vào không nếu không in ra lỗi
@@ -65,4 +75,41 @@ async def get_current_user_data(db: AsyncSession, uid: int):
     if not user:
         raise HTTPException(status_code=401, detail='User not found')
 
+    return user
+
+async def update_profile(
+    name: Optional[str],
+    email: Optional[str],
+    password: Optional[str],
+    avatar: Optional[UploadFile],
+    db:AsyncSession,
+    uid:int
+):
+    result = await db.execute(select(User).where(User.id == uid))
+    user = result.scalar_one_or_none()
+    
+    if not user:
+        raise HTTPException(status_code=404, detail='User not found')
+    
+    if name is not None:
+        user.name = name.strip()
+    if email is not None:
+        user.email = email.strip()
+    if password is not None:
+        user.password = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt())
+    if avatar is not None:
+        try:
+            avatar_res = cloudinary.uploader.upload(
+                avatar.file,
+                resource_type = 'image',
+                folder = f'avatars/{uid}'
+            )
+            avatar_url = avatar_res.get('secure_url')
+            if not avatar_url:
+                raise Exception("Avatar upload failed")
+            user.avatar = avatar_url
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f'Avatar upload error: {e}')
+    await db.commit()
+    await db.refresh(user)
     return user

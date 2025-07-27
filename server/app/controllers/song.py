@@ -75,9 +75,6 @@ async def get_list_song(db):
         return [SongResponse.from_orm(song) for song in songs]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
-from sqlalchemy.future import select
-from sqlalchemy.orm import joinedload
 
 async def favorite_song(fav_song, db: AsyncSession, uid: int):
     try:

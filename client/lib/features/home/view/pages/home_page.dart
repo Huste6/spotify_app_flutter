@@ -2,6 +2,7 @@ import 'package:client/cor/providers/current_song_notifier.dart';
 import 'package:client/cor/theme/app_pallete.dart';
 import 'package:client/cor/utils.dart';
 import 'package:client/features/home/view/pages/library_page.dart';
+import 'package:client/features/profile/view/page/profile_page.dart';
 import 'package:client/features/search/pages/search_page.dart';
 import 'package:client/features/home/view/pages/songs_page.dart';
 import 'package:client/features/home/view/widgets/music_slab.dart';
@@ -113,7 +114,15 @@ class _HomePageState extends ConsumerState<HomePage> {
                             width: 8,
                           ),
                           _buildActionButton(
-                              icon: Icons.person_rounded, onPressed: () {}),
+                              icon: Icons.person_rounded,
+                              onPressed: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const ProfilePage(),
+                                  ),
+                                );
+                              }),
                         ],
                       ),
                     ],
