@@ -6,6 +6,7 @@ import 'package:client/features/profile/viewmodel/profile_viewmodel.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class EditProfileForm extends ConsumerStatefulWidget {
   final UserModel user;
@@ -46,6 +47,39 @@ class _EditProfileFormState extends ConsumerState<EditProfileForm> {
     super.dispose();
   }
 
+  void _showToast(String message, {bool isError = false}) {
+    ShadToaster.of(context).show(ShadToast(
+      title: Row(
+        children: [
+          Icon(
+            isError ? Icons.error : Icons.check_circle,
+            color: isError ? Colors.red : Colors.green,
+            size: 20,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            isError ? 'Error' : 'Success',
+            style: TextStyle(
+              color: isError ? Colors.red : const Color.fromARGB(255, 41, 142, 44),
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+      description: Text(
+        message,
+        style: TextStyle(
+          color: isError ? Colors.red.shade300 : Colors.green.shade300,
+        ),
+      ),
+      action: ShadButton.outline(
+        size: ShadButtonSize.sm,
+        onPressed: () => ShadToaster.of(context).hide(),
+        child: const Text('Dismiss'),
+      ),
+    ));
+  }
+
   Future<void> _pickAvatar() async {
     try {
       final result = await FilePicker.platform.pickFiles(
@@ -60,7 +94,7 @@ class _EditProfileFormState extends ConsumerState<EditProfileForm> {
       }
     } catch (e) {
       if (mounted) {
-        showSnackBar(context, 'Failed to pick image: ${e.toString()}');
+        _showToast('Failed to pick image: ${e.toString()}', isError: true);
       }
     }
   }
@@ -71,7 +105,7 @@ class _EditProfileFormState extends ConsumerState<EditProfileForm> {
     // Check if password and confirm password match
     if (_passwordController.text.isNotEmpty &&
         _passwordController.text != _confirmPasswordController.text) {
-      showSnackBar(context, 'Passwords do not match');
+      _showToast('Passwords do not match', isError: true);
       return;
     }
 
@@ -81,17 +115,20 @@ class _EditProfileFormState extends ConsumerState<EditProfileForm> {
     final hasPasswordChanged = _passwordController.text.isNotEmpty;
     final hasAvatarChanged = _selectedAvatar != null;
 
-    if (!hasNameChanged && !hasEmailChanged && !hasPasswordChanged && !hasAvatarChanged) {
-      showSnackBar(context, 'No changes detected');
+    if (!hasNameChanged &&
+        !hasEmailChanged &&
+        !hasPasswordChanged &&
+        !hasAvatarChanged) {
+      _showToast('No changes detected', isError: true);
       return;
     }
 
     await ref.read(profileViewModelProvider.notifier).updateProfile(
-      name: hasNameChanged ? _nameController.text : null,
-      email: hasEmailChanged ? _emailController.text : null,
-      password: hasPasswordChanged ? _passwordController.text : null,
-      avatar: _selectedAvatar,
-    );
+          name: hasNameChanged ? _nameController.text : null,
+          email: hasEmailChanged ? _emailController.text : null,
+          password: hasPasswordChanged ? _passwordController.text : null,
+          avatar: _selectedAvatar,
+        );
   }
 
   @override
@@ -100,7 +137,7 @@ class _EditProfileFormState extends ConsumerState<EditProfileForm> {
       if (next?.hasError == true) {
         showSnackBar(context, next!.error.toString());
       } else if (next?.hasValue == true && previous?.isLoading == true) {
-        showSnackBar(context, 'Profile updated successfully!');
+        _showToast('Profile updated successfully!');
         Navigator.pop(context);
       }
     });
@@ -142,18 +179,18 @@ class _EditProfileFormState extends ConsumerState<EditProfileForm> {
             child: ClipOval(
               child: _selectedAvatar != null
                   ? Image.file(
-                _selectedAvatar!,
-                fit: BoxFit.cover,
-              )
-                  : (widget.user.avatar != null && widget.user.avatar!.isNotEmpty
-                  ? Image.network(
-                widget.user.avatar!,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return _buildDefaultAvatar();
-                },
-              )
-                  : _buildDefaultAvatar()),
+                      _selectedAvatar!,
+                      fit: BoxFit.cover,
+                    )
+                  : (widget.user.avatar.isNotEmpty
+                      ? Image.network(
+                          widget.user.avatar,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return _buildDefaultAvatar();
+                          },
+                        )
+                      : _buildDefaultAvatar()),
             ),
           ),
         ),
@@ -458,7 +495,9 @@ class _EditProfileFormState extends ConsumerState<EditProfileForm> {
             ),
             suffixIcon: IconButton(
               icon: Icon(
-                _obscureConfirmPassword ? Icons.visibility_off : Icons.visibility,
+                _obscureConfirmPassword
+                    ? Icons.visibility_off
+                    : Icons.visibility,
                 color: Pallete.greyColor.withOpacity(0.7),
               ),
               onPressed: () {

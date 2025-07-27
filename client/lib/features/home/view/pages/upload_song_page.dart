@@ -4,7 +4,6 @@ import 'package:client/cor/theme/app_pallete.dart';
 import 'package:client/cor/utils.dart';
 import 'package:client/cor/widgets/custom_field.dart';
 import 'package:client/cor/widgets/loader.dart';
-import 'package:client/features/home/respository/home_repository.dart';
 import 'package:client/features/home/view/pages/home_page.dart';
 import 'package:client/features/home/view/widgets/audio_wave.dart';
 import 'package:client/features/home/viewmodel/home_viewmodel.dart';

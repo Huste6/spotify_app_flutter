@@ -12,6 +12,12 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'home_viewmodel.g.dart';
 
 @riverpod
+List<SongModel> getRecentlyPlayedSongs(GetRecentlyPlayedSongsRef ref) {
+  final homeLocalRepo = ref.watch(homeLocalRespositoryProvider);
+  return homeLocalRepo.loadSongs();
+}
+
+@riverpod
 Future<List<SongModel>> getAllSongs(GetAllSongsRef ref) async {
   final token =
       ref.watch(currentUserNotifierProvider.select((user) => user!.token));
@@ -86,6 +92,16 @@ class HomeViewModel extends _$HomeViewModel {
 
   List<SongModel> getRecentlyPlayedSong() {
     return _homeLocalRespository.loadSongs();
+  }
+
+  void deleteRecentlyPlayedSong(String songId) {
+    _homeLocalRespository.deleteSong(songId);
+    ref.invalidate(getRecentlyPlayedSongsProvider);
+  }
+
+  void clearAllRecentlyPlayedSongs() {
+    _homeLocalRespository.deleteAllSongs();
+    ref.invalidate(getRecentlyPlayedSongsProvider);
   }
 
   Future<void> favSong({required String songId}) async {

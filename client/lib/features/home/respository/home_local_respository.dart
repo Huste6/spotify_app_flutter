@@ -23,4 +23,16 @@ class HomeLocalRespository {
     }
     return songs;
   }
+
+  void deleteSong(String songId) {
+    box.delete(songId);
+  }
+
+  void deleteAllSongs() {
+    box.clear();
+  }
+
+  bool isSongExists(String songId) {
+    return box.containsKey(songId);
+  }
 }

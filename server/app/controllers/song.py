@@ -128,15 +128,16 @@ async def get_list_favorite_song(db: AsyncSession, uid: int):
 
 async def get_song_search(db:AsyncSession, query:str):
     try:
-        query = normalize_text(query)
-        stmt = select(Song).where(
-            or_(
-                func.unaccent(func.lower(Song.song_name)).ilike(f"%{query}%"),
-                func.unaccent(func.lower(Song.artist)).ilike(f"%{query}%")
+        search_pattern = f"%{query.lower()}%"
+        result = await db.execute(
+            select(Song).where(
+                or_(
+                    func.lower(Song.song_name).ilike(search_pattern),
+                    func.lower(Song.artist).ilike(search_pattern)
+                )
             )
         )
-        result = await db.execute(stmt)
         songs = result.scalars().all()
-        return songs
+        return [SongResponse.from_orm(song) for song in songs]
     except Exception as e:
         raise HTTPException(status_code=500,detail=str(e))

@@ -1,5 +1,4 @@
 import 'package:client/cor/theme/app_pallete.dart';
-import 'package:client/cor/utils.dart';
 import 'package:client/cor/widgets/loader.dart';
 import 'package:client/features/auth/view/pages/login_page.dart';
 import 'package:client/features/auth/view/widgets/auth_gradient_button.dart';
@@ -7,6 +6,7 @@ import 'package:client/cor/widgets/custom_field.dart';
 import 'package:client/features/auth/viewmodel/auth_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 class SignupPage extends ConsumerStatefulWidget {
   const SignupPage({super.key});
@@ -29,6 +29,39 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     super.dispose();
   }
 
+  void _showToast(String message, {bool isError = false}) {
+    ShadToaster.of(context).show(ShadToast(
+      title: Row(
+        children: [
+          Icon(
+            isError ? Icons.error : Icons.check_circle,
+            color: isError ? Colors.red : Colors.green,
+            size: 20,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            isError ? 'Lỗi' : 'Thành công',
+            style: TextStyle(
+              color: isError ? Colors.red : Colors.green,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+      description: Text(
+        message,
+        style: TextStyle(
+          color: isError ? Colors.red.shade300 : Colors.green.shade300,
+        ),
+      ),
+      action: ShadButton.outline(
+        size: ShadButtonSize.sm,
+        onPressed: () => ShadToaster.of(context).hide(),
+        child: const Text('Đóng'),
+      ),
+    ));
+  }
+
   @override
   Widget build(BuildContext context) {
     final isLoading = ref
@@ -38,13 +71,20 @@ class _SignupPageState extends ConsumerState<SignupPage> {
     ref.listen(authViewModelProvider, (_, next) {
       next?.when(
           data: (data) {
-            showSnackBar(
-                context, 'Account created successfully! Please Login.');
-            Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const LoginPage()));
+            // Hiển thị thông báo đăng ký thành công
+            _showToast('Tài khoản đã được tạo thành công! Vui lòng đăng nhập.');
+
+            // Navigate to Login Page sau khi hiển thị thông báo
+            Future.delayed(const Duration(milliseconds: 2000), () {
+              Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+              );
+            });
           },
           error: (error, stackTrace) {
-            showSnackBar(context, error.toString());
+            // Hiển thị thông báo đăng ký thất bại
+            _showToast('Đăng ký thất bại: ${error.toString()}', isError: true);
           },
           loading: () {});
     });

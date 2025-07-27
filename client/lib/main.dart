@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive/hive.dart';
 import 'package:just_audio_background/just_audio_background.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shadcn_ui/shadcn_ui.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,12 +24,15 @@ void main() async {
   final container = ProviderContainer();
 
   try {
-    await container.read(authViewModelProvider.notifier).initSharedPreferences();
-    final userdata = await container.read(authViewModelProvider.notifier).getData();
-    runApp(UncontrolledProviderScope(container: container, child: const MyApp()));
+    await container
+        .read(authViewModelProvider.notifier)
+        .initSharedPreferences();
+    runApp(
+        UncontrolledProviderScope(container: container, child: const MyApp()));
   } catch (e) {
     print('Error during initialization: $e');
-    runApp(UncontrolledProviderScope(container: container, child: const MyApp()));
+    runApp(
+        UncontrolledProviderScope(container: container, child: const MyApp()));
   }
 }
 
@@ -40,23 +44,36 @@ class MyApp extends ConsumerWidget {
     final currentUser = ref.watch(currentUserNotifierProvider);
     final authState = ref.watch(authViewModelProvider);
 
-    return MaterialApp(
+    return ShadApp(
       title: 'Music App',
-      theme: AppTheme.darkThemeMode,
+      theme: ShadThemeData(
+        brightness: Brightness.dark,
+        colorScheme: const ShadSlateColorScheme.dark(),
+      ),
+      darkTheme: ShadThemeData(
+        brightness: Brightness.dark,
+        colorScheme: const ShadSlateColorScheme.dark(),
+      ),
+      themeMode: ThemeMode.dark,
       debugShowCheckedModeBanner: false,
-      home: _buildHome(currentUser,authState),
+      materialThemeBuilder: (context, theme) {
+        return AppTheme.darkThemeMode;
+      },
+      home: ShadToaster(
+        child: _buildHome(currentUser, authState),
+      ),
     );
   }
 
-  Widget _buildHome(currentUser, AsyncValue<UserModel>? authState){
-    if(authState?.isLoading == true){
+  Widget _buildHome(currentUser, AsyncValue<UserModel>? authState) {
+    if (authState?.isLoading == true) {
       return const Scaffold(
         body: Center(
           child: CircularProgressIndicator(),
         ),
       );
     }
-    if(currentUser!=null){
+    if (currentUser != null) {
       return const HomePage();
     }
     return const LoginPage();

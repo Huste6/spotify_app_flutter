@@ -134,10 +134,24 @@ class _HomePageState extends ConsumerState<HomePage> {
         ),
       ),
       body: Stack(children: [
-        pages[selectedIndex],
-        const Positioned(bottom: 0, child: MusicSlab())
+        Padding(
+          padding: const EdgeInsets.only(bottom: 60),
+          child: pages[selectedIndex],
+        ),
+        const Positioned(
+          bottom: 0,
+          child: MusicSlab(),
+        )
       ]),
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: SizedBox(
+        height: 60,
+        child: BottomNavigationBar(
+          type: BottomNavigationBarType.fixed,
+          elevation: 0,
+          backgroundColor: Pallete.backgroundColor,
+          selectedFontSize: 12,
+          unselectedFontSize: 12,
+          iconSize: 24,
           currentIndex: selectedIndex,
           onTap: (val) {
             setState(() {
@@ -150,18 +164,26 @@ class _HomePageState extends ConsumerState<HomePage> {
                   selectedIndex == 0
                       ? 'assets/images/home_filled.png'
                       : 'assets/images/home_unfilled.png',
+                  width: 24,
+                  height: 24,
                   color: selectedIndex == 0
                       ? Pallete.whiteColor
                       : Pallete.inactiveBottomBarItemColor,
                 ),
                 label: 'Home'),
             BottomNavigationBarItem(
-                icon: Image.asset('assets/images/library.png',
-                    color: selectedIndex == 1
-                        ? Pallete.whiteColor
-                        : Pallete.inactiveBottomBarItemColor),
-                label: 'library'),
-          ]),
+                icon: Image.asset(
+                  'assets/images/library.png',
+                  width: 24,
+                  height: 24,
+                  color: selectedIndex == 1
+                      ? Pallete.whiteColor
+                      : Pallete.inactiveBottomBarItemColor,
+                ),
+                label: 'Library'),
+          ],
+        ),
+      ),
     );
   }
 }

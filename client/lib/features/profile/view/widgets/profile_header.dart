@@ -11,10 +11,14 @@ class ProfileHeader extends StatelessWidget {
     return Column(
       children: [
         _buildAvatar(),
-        const SizedBox(height: 16,),
-        _buildUserField(user.name),
-        const SizedBox(height: 8,),
-        _buildUserField(user.email),
+        const SizedBox(
+          height: 16,
+        ),
+        _buildUserField(user.name, Pallete.whiteColor),
+        const SizedBox(
+          height: 8,
+        ),
+        _buildUserField(user.email, Pallete.greyColor.withOpacity(0.7)),
       ],
     );
   }
@@ -86,11 +90,11 @@ class ProfileHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildUserField(String text){
+  Widget _buildUserField(String text, Color colors) {
     return Text(
       text,
-      style: const TextStyle(
-        color: Pallete.whiteColor,
+      style: TextStyle(
+        color: colors,
         fontSize: 24,
         fontWeight: FontWeight.bold,
       ),

@@ -6,6 +6,25 @@ part of 'home_viewmodel.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$getRecentlyPlayedSongsHash() =>
+    r'd6fbdd56bc64750cd145c5f7ff225b4b73158b5b';
+
+/// See also [getRecentlyPlayedSongs].
+@ProviderFor(getRecentlyPlayedSongs)
+final getRecentlyPlayedSongsProvider =
+    AutoDisposeProvider<List<SongModel>>.internal(
+  getRecentlyPlayedSongs,
+  name: r'getRecentlyPlayedSongsProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$getRecentlyPlayedSongsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+typedef GetRecentlyPlayedSongsRef = AutoDisposeProviderRef<List<SongModel>>;
 String _$getAllSongsHash() => r'a06f06bef1b9213d7a6fb1458e5a4d32f0c45f7e';
 
 /// See also [getAllSongs].
@@ -191,7 +210,7 @@ class _GetSearchSongsProviderElement
   String get searchQuery => (origin as GetSearchSongsProvider).searchQuery;
 }
 
-String _$homeViewModelHash() => r'aad60eb20173528125fa9836f5c099ae839ed760';
+String _$homeViewModelHash() => r'66178a24a20b5885ee5fb28186fa52876ef740ee';
 
 /// See also [HomeViewModel].
 @ProviderFor(HomeViewModel)
